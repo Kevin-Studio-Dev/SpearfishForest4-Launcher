@@ -1,11 +1,17 @@
 name: Deploy to GitHub Pages
 
 on:
+  workflow_run:
+    workflows: ["Update Latest Version"]
+    types:
+      - completed
   push:
     paths:
-      - 'files/**'  # files 폴더의 변경사항이 있을 때만 실행
+      - 'files/**'
     branches:
-      - master  # or your default branch name
+      - main
+    paths-ignore:
+      - 'files/v*/**'  # v로 시작하는 폴더 변경은 제외 (이미 Update Latest Version에서 처리)
 
 permissions:
   contents: read
