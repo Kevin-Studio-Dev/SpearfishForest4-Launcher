@@ -1,0 +1,59 @@
+name: Update Latest Version
+
+on:
+  push:
+    paths:
+      - 'files/v*/**'  # v로 시작하는 폴더의 변경사항 감지
+    branches:
+      - main  # or your default branch
+
+jobs:
+  update-latest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Update Latest Version
+        run: |
+          python - <<EOF
+          import os
+          import re
+          import shutil
+          from distutils.version import LooseVersion
+          
+          # files 디렉토리 내의 모든 폴더 검사
+          files_dir = 'files'
+          version_pattern = re.compile(r'^v\d+\.\d+\.\d+$')
+          versions = []
+          
+          for item in os.listdir(files_dir):
+              item_path = os.path.join(files_dir, item)
+              if os.path.isdir(item_path) and version_pattern.match(item):
+                  versions.append(item)
+          
+          if versions:
+              # 버전 정렬 (v0.0.1, v0.0.2 등)
+              latest_version = max(versions, key=lambda x: LooseVersion(x[1:]))  # v 제거 후 비교
+              latest_dir = os.path.join(files_dir, 'latest')
+              
+              # latest 디렉토리가 있으면 삭제
+              if os.path.exists(latest_dir):
+                  shutil.rmtree(latest_dir)
+              
+              # 최신 버전을 latest로 복사
+              shutil.copytree(os.path.join(files_dir, latest_version), latest_dir)
+              print(f"Updated latest to version: {latest_version}")
+          EOF
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add files/latest
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update latest version" && git push)
