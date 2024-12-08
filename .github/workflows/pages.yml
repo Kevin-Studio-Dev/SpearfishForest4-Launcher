@@ -1,10 +1,10 @@
 name: Deploy Pages
 
 on:
-  workflow_run:
-    workflows: ["Update Latest Version"]
-    types:
-      - completed
+  push:
+    paths:
+      - 'files/**'
+      - '!files/v*/**'
     branches:
       - master
 
