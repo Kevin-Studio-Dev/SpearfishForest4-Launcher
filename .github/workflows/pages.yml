@@ -8,10 +8,9 @@ on:
   push:
     paths:
       - 'files/**'
+      - '!files/v*/**'
     branches:
       - main
-    paths-ignore:
-      - 'files/v*/**'  # v로 시작하는 폴더 변경은 제외 (이미 Update Latest Version에서 처리)
 
 permissions:
   contents: read
