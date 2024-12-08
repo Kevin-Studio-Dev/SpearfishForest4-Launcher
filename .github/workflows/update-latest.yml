@@ -31,6 +31,32 @@ jobs:
           
           # 전체 디렉토리 복사
           cp -r "$latest_version" latest
+          
+          # index.html 생성
+          cd latest
+          echo "<!DOCTYPE html>
+          <html>
+          <head>
+              <title>Latest Files</title>
+              <style>
+                  body { font-family: Arial, sans-serif; margin: 40px; }
+                  .file-list { list-style: none; padding: 0; }
+                  .file-list li { margin: 10px 0; }
+                  .file-list a { text-decoration: none; color: #0366d6; }
+                  .file-list a:hover { text-decoration: underline; }
+              </style>
+          </head>
+          <body>
+              <h1>Latest Files</h1>
+              <ul class='file-list'>" > index.html
+          
+          # 파일 목록 생성
+          find . -type f ! -name 'index.html' | sort | while read -r file; do
+              file=${file#./}
+              echo "<li><a href='$file'>$file</a></li>" >> index.html
+          done
+          
+          echo "</ul></body></html>" >> index.html
           echo "Updated latest to version: $latest_version"
 
       - name: Commit and push if changed
