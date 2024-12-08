@@ -2,8 +2,6 @@ name: Deploy Pages
 
 on:
   push:
-    paths:
-      - 'files/**'
     branches:
       - master
 
