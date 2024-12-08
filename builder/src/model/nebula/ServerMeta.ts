@@ -26,7 +26,7 @@ export function getDefaultServerMeta(id: string, version: string, options?: Serv
             name: `${id} (Minecraft ${version})`,
             description: `${id} Running Minecraft ${version}`,
             icon: 'How to set the server icon: https://github.com/dscalzi/Nebula#setting-the-server-icon',
-            address: 'localhost:25565',
+            address: 'proxy.spearforest.spearfish.mfhz.me:10000',
             discord: {
                 shortId: '<FILL IN OR REMOVE DISCORD OBJECT>',
                 largeImageText: '<FILL IN OR REMOVE DISCORD OBJECT>',

@@ -235,44 +235,119 @@ const refreshMojangStatuses = async function(){
     document.getElementById('mojang_status_icon').style.color = MojangRestAPI.statusToHex(status)
 }
 
+// 서버 상태 확인 함수
 const refreshServerStatus = async (fade = false) => {
-    loggerLanding.info('Refreshing Server Status')
-    const serv = (await DistroAPI.getDistribution()).getServerById(ConfigManager.getSelectedServer())
-
-    let pLabel = Lang.queryJS('landing.serverStatus.server')
-    let pVal = Lang.queryJS('landing.serverStatus.offline')
-
+    loggerLanding.debug('Starting server status refresh')
     try {
+        const distribution = await DistroAPI.getDistribution()
+        const serv = distribution.getServerById(ConfigManager.getSelectedServer())
+        
+        // Always enable launch button regardless of server status
+        setLaunchEnabled(true)
+        
+        // 서버가 선택되지 않았으면 상태 업데이트 중지
+        if (!serv) {
+            loggerLanding.debug('No server selected')
+            return
+        }
 
-        const servStat = await getServerStatus(47, serv.hostname, serv.port)
-        console.log(servStat)
-        pLabel = Lang.queryJS('landing.serverStatus.players')
-        pVal = servStat.players.online + '/' + servStat.players.max
+        let pLabel = '서버'
+        let pVal = '확인중...'
 
-    } catch (err) {
-        loggerLanding.warn('Unable to refresh server status, assuming offline.')
-        loggerLanding.debug(err)
-    }
-    if(fade){
-        $('#server_status_wrapper').fadeOut(250, () => {
+        try {
+            // 프록시 서버 연결 테스트
+            const [hostname, portStr] = serv.address.split(':')
+            const port = parseInt(portStr) || 25565
+            
+            await new Promise((resolve, reject) => {
+                const net = require('net')
+                const socket = new net.Socket()
+                let resolved = false
+                
+                // 타임아웃 설정
+                const timeout = setTimeout(() => {
+                    if (!resolved) {
+                        socket.destroy()
+                        reject(new Error('Connection timeout'))
+                    }
+                }, 3000)
+                
+                socket.connect(port, hostname, () => {
+                    if (!resolved) {
+                        resolved = true
+                        clearTimeout(timeout)
+                        socket.destroy()
+                        resolve()
+                    }
+                })
+                
+                socket.on('error', (err) => {
+                    if (!resolved) {
+                        resolved = true
+                        clearTimeout(timeout)
+                        reject(err)
+                    }
+                })
+            })
+            
+            pVal = '온라인'
+            loggerLanding.debug('Server is online')
+
+        } catch (err) {
+            pVal = '오프라인'
+            loggerLanding.debug('Server is offline')
+        }
+
+        if(fade){
+            $('#server_status_wrapper').fadeOut(250, () => {
+                document.getElementById('landingPlayerLabel').innerHTML = pLabel
+                document.getElementById('player_count').innerHTML = pVal
+                $('#server_status_wrapper').fadeIn(500)
+            })
+        } else {
             document.getElementById('landingPlayerLabel').innerHTML = pLabel
             document.getElementById('player_count').innerHTML = pVal
-            $('#server_status_wrapper').fadeIn(500)
-        })
-    } else {
-        document.getElementById('landingPlayerLabel').innerHTML = pLabel
-        document.getElementById('player_count').innerHTML = pVal
+        }
+        
+    } catch (err) {
+        loggerLanding.error('Failed to refresh server status:', err)
     }
-    
 }
 
+// 서버 상태 초기화 및 주기적 확인 설정
+let serverStatusInterval
+const initializeServerStatus = () => {
+    // 기존 인터벌 제거
+    if(serverStatusInterval) {
+        clearInterval(serverStatusInterval)
+    }
+    
+    // Always enable launch button
+    setLaunchEnabled(true)
+    
+    // 즉시 상태 확인
+    refreshServerStatus(false)
+    
+    // 10초마다 상태 확인
+    serverStatusInterval = setInterval(() => {
+        refreshServerStatus(true)
+    }, 10000)
+}
+
+// 페이지 로드 완료 시 서버 상태 확인 시작
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(initializeServerStatus, 1000)
+})
+
+// Real text is set in uibinder.js on distributionIndexDone.
+server_selection_button.innerHTML = '&#8226; ' + Lang.queryJS('landing.selectedServer.loading')
+
+// Update Mojang Status Color
 refreshMojangStatuses()
 // Server Status is refreshed in uibinder.js on distributionIndexDone.
 
 // Refresh statuses every hour. The status page itself refreshes every day so...
 let mojangStatusListener = setInterval(() => refreshMojangStatuses(true), 60*60*1000)
-// Set refresh rate to once every 5 minutes.
-let serverStatusListener = setInterval(() => refreshServerStatus(true), 300000)
 
 /**
  * Shows an error overlay, toggles off the launch area.

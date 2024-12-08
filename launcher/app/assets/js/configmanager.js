@@ -791,3 +791,116 @@ exports.getAllowPrerelease = function(def = false){
 exports.setAllowPrerelease = function(allowPrerelease){
     config.settings.launcher.allowPrerelease = allowPrerelease
 }
+
+// Minecraft Options Management
+
+/**
+ * 서버의 리소스팩 경로를 가져옵니다.
+ * 
+ * @param {string} serverid 서버 ID
+ * @returns {string} 리소스팩 디렉토리의 절대 경로
+ */
+exports.getResourcePacksPath = function(serverid){
+    return path.join(exports.getInstanceDirectory(), serverid, 'files', 'resourcepacks')
+}
+
+/**
+ * 서버에 설치된 리소스팩 목록을 가져옵니다.
+ * 
+ * @param {string} serverid 서버 ID
+ * @returns {Array<string>} 설치된 리소스팩 목록
+ */
+exports.getInstalledResourcePacks = function(serverid){
+    try {
+        const resourcePacksDir = exports.getResourcePacksPath(serverid)
+        if(!fs.existsSync(resourcePacksDir)) {
+            return ["vanilla", "mod_resources"]
+        }
+
+        const packs = fs.readdirSync(resourcePacksDir)
+            .filter(file => file.endsWith('.zip') || !file.includes('.'))
+            .map(file => `file/${file}`)
+
+        return ["vanilla", "mod_resources", ...packs]
+    } catch(err) {
+        logger.error(`Failed to get resource packs for server ${serverid}:`, err)
+        return ["vanilla", "mod_resources"]
+    }
+}
+
+/**
+ * 기본 Minecraft 옵션을 생성합니다.
+ * @param {string} serverid 서버 ID
+ * @returns {Object} 기본 Minecraft 옵션
+ */
+function createDefaultMinecraftOptions(serverid) {
+    return {
+        lang: 'ko_kr',
+        resourcePacks: exports.getInstalledResourcePacks(serverid),
+        incompatibleResourcePacks: [],
+        fullscreen: true,
+        guiScale: 3
+    }
+}
+
+exports.saveMinecraftOptions = function(serverid, options){
+    try {
+        const optionsPath = exports.getMinecraftOptionsPath(serverid)
+        fs.ensureDirSync(path.dirname(optionsPath))
+        
+        // 기본 옵션과 병합
+        const finalOptions = {
+            ...createDefaultMinecraftOptions(serverid),
+            ...options
+        }
+        
+        // 나머지 코드는 동일...
+    } catch (err) {
+        logger.error(`Failed to save Minecraft options.txt for server ${serverid}:`, err)
+    }
+}
+
+exports.loadMinecraftOptions = function(serverid){
+    try {
+        const optionsPath = exports.getMinecraftOptionsPath(serverid)
+        if(!fs.existsSync(optionsPath)){
+            logger.info(`No Minecraft options.txt found for server ${serverid}`)
+            return createDefaultMinecraftOptions(serverid)
+        }
+
+        // 나머지 코드는 동일...
+
+        // 기본 옵션과 병합하여 반환
+        return {
+            ...createDefaultMinecraftOptions(serverid),
+            ...options
+        }
+    } catch (err) {
+        logger.error(`Failed to load Minecraft options.txt for server ${serverid}:`, err)
+        return createDefaultMinecraftOptions(serverid)
+    }
+}
+
+exports.initializeMinecraftOptions = function(serverid){
+    try {
+        const optionsPath = exports.getMinecraftOptionsPath(serverid)
+        
+        // 기존 options.txt가 있다면 초기화하지 않음
+        if(fs.existsSync(optionsPath)) {
+            logger.info(`Existing options.txt found for server ${serverid}, skipping initialization`)
+            return
+        }
+
+        // 새로운 options.txt 생성
+        exports.saveMinecraftOptions(serverid, createDefaultMinecraftOptions(serverid))
+        logger.info(`Initialized Minecraft options.txt for server ${serverid}`)
+
+        // files 디렉토리 내의 다른 필요한 디렉토리들도 생성
+        const filesDir = path.dirname(optionsPath)
+        const resourcepacksDir = path.join(filesDir, 'resourcepacks')
+        fs.ensureDirSync(resourcepacksDir)
+
+    } catch (err) {
+        logger.error(`Failed to initialize Minecraft options for server ${serverid}:`, err)
+    }
+}

@@ -31,13 +31,11 @@ exports.loadLanguage = function(id){
 
 exports.query = function(id, placeHolders){
     try {
-        console.log(`Querying language key: ${id}`)
         let query = id.split('.')
         let res = lang
         for(let q of query){
             res = res[q]
             if (res === undefined) {
-                console.warn(`Language key not found: ${id}`)
                 return ''
             }
         }
@@ -55,7 +53,25 @@ exports.query = function(id, placeHolders){
 }
 
 exports.queryJS = function(id, placeHolders){
-    return exports.query(`js.${id}`, placeHolders)
+    if(id == null){
+        return null
+    }
+    if(!id.includes('.')){
+        return null
+    }
+
+    const ids = id.split('.')
+    let res = exports.query(ids[0])
+    if(res == null) return null
+
+    for(let i=1; i<ids.length; i++){
+        res = res[ids[i]]
+        if(res == null){
+            return null
+        }
+    }
+
+    return res
 }
 
 exports.queryEJS = function(id, placeHolders){
