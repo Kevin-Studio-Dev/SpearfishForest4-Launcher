@@ -5,7 +5,7 @@ on:
     paths:
       - 'files/v*/**'  # v로 시작하는 폴더의 변경사항 감지
     branches:
-      - main  # or your default branch
+      - master  # or your default branch
 
 jobs:
   update-latest:

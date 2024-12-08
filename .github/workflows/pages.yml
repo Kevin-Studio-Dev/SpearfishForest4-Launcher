@@ -10,7 +10,7 @@ on:
       - 'files/**'
       - '!files/v*/**'
     branches:
-      - main
+      - master
 
 permissions:
   contents: read
