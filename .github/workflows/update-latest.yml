@@ -28,16 +28,15 @@ jobs:
           
           # latest 디렉토리 생성 또는 정리
           rm -rf latest
-          mkdir -p latest
           
-          # distribution.json 파일만 복사
-          cp "$latest_version/distribution.json" latest/
+          # 전체 디렉토리 복사
+          cp -r "$latest_version" latest
           echo "Updated latest to version: $latest_version"
 
       - name: Commit and push if changed
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add files/latest/distribution.json
-          git commit -m "Update latest distribution.json" || exit 0
+          git add files/latest
+          git commit -m "Update latest files to match $latest_version" || exit 0
           git push
