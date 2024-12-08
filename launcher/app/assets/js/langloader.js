@@ -6,22 +6,52 @@ const merge = require('lodash.merge')
 let lang
 
 exports.loadLanguage = function(id){
-    lang = merge(lang || {}, toml.parse(fs.readFileSync(path.join(__dirname, '..', 'lang', `${id}.toml`))) || {})
+    try {
+        console.log(`Loading language file: ${id}`)
+        const filePath = path.join(__dirname, '..', 'lang', `${id}.toml`)
+        console.log(`Language file path: ${filePath}`)
+        
+        if (!fs.existsSync(filePath)) {
+            console.error(`Language file not found: ${filePath}`)
+            return
+        }
+
+        const fileContent = fs.readFileSync(filePath, 'utf-8')
+        console.log(`Language file content length: ${fileContent.length} bytes`)
+        
+        const parsed = toml.parse(fileContent)
+        console.log(`Parsed language keys: ${Object.keys(parsed).join(', ')}`)
+        
+        lang = merge(lang || {}, parsed || {})
+        console.log(`Language ${id} loaded successfully`)
+    } catch (error) {
+        console.error(`Error loading language ${id}:`, error)
+    }
 }
 
 exports.query = function(id, placeHolders){
-    let query = id.split('.')
-    let res = lang
-    for(let q of query){
-        res = res[q]
+    try {
+        console.log(`Querying language key: ${id}`)
+        let query = id.split('.')
+        let res = lang
+        for(let q of query){
+            res = res[q]
+            if (res === undefined) {
+                console.warn(`Language key not found: ${id}`)
+                return ''
+            }
+        }
+        let text = res === lang ? '' : res
+        if (placeHolders) {
+            Object.entries(placeHolders).forEach(([key, value]) => {
+                text = text.replace(`{${key}}`, value)
+            })
+        }
+        return text
+    } catch (error) {
+        console.error(`Error querying language key ${id}:`, error)
+        return ''
     }
-    let text = res === lang ? '' : res
-    if (placeHolders) {
-        Object.entries(placeHolders).forEach(([key, value]) => {
-            text = text.replace(`{${key}}`, value)
-        })
-    }
-    return text
 }
 
 exports.queryJS = function(id, placeHolders){
@@ -33,11 +63,18 @@ exports.queryEJS = function(id, placeHolders){
 }
 
 exports.setupLanguage = function(){
-    // Load Language Files
-    exports.loadLanguage('en_US')
-    // Uncomment this when translations are ready
-    //exports.loadLanguage('xx_XX')
-
-    // Load Custom Language File for Launcher Customizer
-    exports.loadLanguage('_custom')
+    try {
+        console.log('Setting up languages...')
+        // Load Language Files
+        exports.loadLanguage('en_US')  // Load English as fallback
+        exports.loadLanguage('ko_KR')  // Load Korean as primary
+        
+        // Load Custom Language File for Launcher Customizer
+        if (fs.existsSync(path.join(__dirname, '..', 'lang', '_custom.toml'))) {
+            exports.loadLanguage('_custom')
+        }
+        console.log('Language setup complete')
+    } catch (error) {
+        console.error('Error in setupLanguage:', error)
+    }
 }

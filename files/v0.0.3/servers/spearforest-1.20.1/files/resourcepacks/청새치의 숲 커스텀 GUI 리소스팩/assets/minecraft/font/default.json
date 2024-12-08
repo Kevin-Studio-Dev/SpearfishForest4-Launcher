@@ -1,0 +1,186 @@
+{
+	"providers": [
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/space.png",
+			"chars": [ "\uE000" ],
+			"ascent": -32768,
+			"height": -10
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/phone.png",
+			"chars": [ "\uE100" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/phone_money.png",
+			"chars": [ "\uE110" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/phone_property.png",
+			"chars": [ "\uE120" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/property_main.png",
+			"chars": [ "\uE121" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/property_member.png",
+			"chars": [ "\uE122" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/property_permission.png",
+			"chars": [ "\uE123" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/phone_documents1.png",
+			"chars": [ "\uE130" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/phone_documents2.png",
+			"chars": [ "\uE140" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/documents_hunt.png",
+			"chars": [ "\uE141" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/documents_mine.png",
+			"chars": [ "\uE142" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/documents_farm.png",
+			"chars": [ "\uE143" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/documents_fish.png",
+			"chars": [ "\uE144" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/documents_paint.png",
+			"chars": [ "\uE145" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/phone_radish.png",
+			"chars": [ "\uE150" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/shop_radish.png",
+			"chars": [ "\uE210" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/shop1.png",
+			"chars": [ "\uE211" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/shop2.png",
+			"chars": [ "\uE212" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/shop3.png",
+			"chars": [ "\uE213" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/shop4.png",
+			"chars": [ "\uE214" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/confirm.png",
+			"chars": [ "\uE300" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/luckybox.png",
+			"chars": [ "\uE310" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/special_luckybox.png",
+			"chars": [ "\uE320" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/portal_main.png",
+			"chars": [ "\uE330" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/portal_yasang.png",
+			"chars": [ "\uE331" ],
+			"ascent": 10,
+			"height": 256
+		},
+		{
+			"type": "bitmap",
+			"file": "minecraft:font/portal_village.png",
+			"chars": [ "\uE332" ],
+			"ascent": 10,
+			"height": 256
+		}
+	]
+}

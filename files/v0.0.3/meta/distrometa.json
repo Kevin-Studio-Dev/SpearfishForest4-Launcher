@@ -1,0 +1,11 @@
+{
+  "$schema": "file:///Users/hellosunghyun/Documents/Github/SpearfishForest4-Launcher/files/v0.0.3/schemas/DistroMetaSchema.schema.json",
+  "meta": {
+    "rss": "http://kevin-studio-dev.github.io/SpearfishForest4-Launcher/news.xml",
+    "discord": {
+      "clientId": "1313116004716511322",
+      "smallImageText": "SpearfishForest4",
+      "smallImageKey": "icon"
+    }
+  }
+}

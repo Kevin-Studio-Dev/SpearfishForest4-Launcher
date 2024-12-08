@@ -1,8 +1,6 @@
-const remoteMain = require('@electron/remote/main')
-remoteMain.initialize()
-
 // Requirements
 const { app, BrowserWindow, ipcMain, Menu, shell } = require('electron')
+const remoteMain                        = require('@electron/remote/main')
 const autoUpdater                       = require('electron-updater').autoUpdater
 const ejse                              = require('ejs-electron')
 const fs                                = require('fs')
@@ -13,12 +11,24 @@ const { pathToFileURL }                 = require('url')
 const { AZURE_CLIENT_ID, MSFT_OPCODE, MSFT_REPLY_TYPE, MSFT_ERROR, SHELL_OPCODE } = require('./app/assets/js/ipcconstants')
 const LangLoader                        = require('./app/assets/js/langloader')
 
+// Initialize @electron/remote
+remoteMain.initialize()
+
+console.log('Starting application...')
+
 // Setup Lang
-LangLoader.setupLanguage()
+try {
+    console.log('Setting up language...')
+    LangLoader.setupLanguage()
+    console.log('Language setup complete')
+} catch (error) {
+    console.error('Error setting up language:', error)
+}
 
 // Setup auto updater.
 function initAutoUpdater(event, data) {
-
+    console.log('Initializing auto updater...')
+    
     if(data){
         autoUpdater.allowPrerelease = true
     } else {
@@ -26,10 +36,10 @@ function initAutoUpdater(event, data) {
         // autoUpdater.allowPrerelease = true
     }
     
-    if(isDev){
-        autoUpdater.autoInstallOnAppQuit = false
-        autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml')
-    }
+    // if(isDev){
+    //     autoUpdater.autoInstallOnAppQuit = false
+    //     autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml')
+    // }
     if(process.platform === 'darwin'){
         autoUpdater.autoDownload = false
     }
@@ -234,26 +244,33 @@ function createWindow() {
         webPreferences: {
             preload: path.join(__dirname, 'app', 'assets', 'js', 'preloader.js'),
             nodeIntegration: true,
-            contextIsolation: false
+            contextIsolation: false,
+            enableRemoteModule: true,
+            worldSafeExecuteJavaScript: true
         },
         backgroundColor: '#171614'
     })
     remoteMain.enable(win.webContents)
 
-    const data = {
-        bkid: Math.floor((Math.random() * fs.readdirSync(path.join(__dirname, 'app', 'assets', 'images', 'backgrounds')).length)),
-        lang: (str, placeHolders) => LangLoader.queryEJS(str, placeHolders)
+    win.loadFile(path.join(__dirname, 'app', 'app.ejs'))
+    win.webContents.openDevTools()
+
+    // Initialize EJS data before loading the window
+    try {
+        const backgroundsPath = path.join(__dirname, 'app', 'assets', 'images', 'backgrounds')
+        const backgroundFiles = fs.readdirSync(backgroundsPath)
+        const data = {
+            bkid: backgroundFiles.length > 0 ? Math.floor(Math.random() * backgroundFiles.length) : 0,
+            lang: (str, placeHolders) => LangLoader.queryEJS(str, placeHolders)
+        }
+        Object.entries(data).forEach(([key, val]) => ejse.data(key, val))
+    } catch (err) {
+        console.error('Error initializing EJS data:', err)
+        ejse.data('bkid', 0)
+        ejse.data('lang', (str, placeHolders) => LangLoader.queryEJS(str, placeHolders))
     }
-    Object.entries(data).forEach(([key, val]) => ejse.data(key, val))
-
-    win.loadURL(pathToFileURL(path.join(__dirname, 'app', 'app.ejs')).toString())
-
-    /*win.once('ready-to-show', () => {
-        win.show()
-    })*/
 
     win.removeMenu()
-
     win.resizable = true
 
     win.on('closed', () => {
@@ -271,6 +288,14 @@ function createMenu() {
             submenu: [{
                 label: 'About Application',
                 selector: 'orderFrontStandardAboutPanel:'
+            }, {
+                type: 'separator'
+            }, {
+                label: 'Toggle Developer Tools',
+                accelerator: 'Alt+Command+I',
+                click: function() {
+                    BrowserWindow.getFocusedWindow().webContents.toggleDevTools();
+                }
             }, {
                 type: 'separator'
             }, {
