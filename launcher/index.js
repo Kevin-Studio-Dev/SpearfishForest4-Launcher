@@ -253,7 +253,7 @@ function createWindow() {
     remoteMain.enable(win.webContents)
 
     win.loadFile(path.join(__dirname, 'app', 'app.ejs'))
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
 
     // Initialize EJS data before loading the window
     try {
