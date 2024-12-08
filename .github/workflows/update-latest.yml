@@ -7,6 +7,10 @@ on:
     branches:
       - master  # or your default branch
 
+concurrency:
+  group: "update-latest"
+  cancel-in-progress: false
+
 jobs:
   update-latest:
     runs-on: ubuntu-latest
