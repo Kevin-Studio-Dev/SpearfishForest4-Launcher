@@ -5,7 +5,7 @@ on:
     paths:
       - 'files/**'  # files 폴더의 변경사항이 있을 때만 실행
     branches:
-      - main  # or your default branch name
+      - master  # or your default branch name
 
 permissions:
   contents: read
