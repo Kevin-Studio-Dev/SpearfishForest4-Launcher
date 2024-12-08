@@ -45,13 +45,18 @@ class ProcessBuilder {
      * Convienence method to run the functions typically used to build a process.
      */
     build(){
-        fs.ensureDirSync(this.gameDir)
+        if(!fs.existsSync(this.gameDir)) {
+            fs.ensureDirSync(this.gameDir)
+        }
+        
         const tempNativePath = path.join(os.tmpdir(), ConfigManager.getTempNativeFolder(), crypto.pseudoRandomBytes(16).toString('hex'))
+        
         process.throwDeprecation = true
         this.setupLiteLoader()
         logger.info('Using liteloader:', this.usingLiteLoader)
         this.usingFabricLoader = this.server.modules.some(mdl => mdl.rawModule.type === Type.Fabric)
         logger.info('Using fabric loader:', this.usingFabricLoader)
+        
         const modObj = this.resolveModConfiguration(ConfigManager.getModConfiguration(this.server.rawServer.id).mods, this.server.modules)
         
         // Mod list below 1.13

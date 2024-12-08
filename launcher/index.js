@@ -253,7 +253,12 @@ function createWindow() {
     remoteMain.enable(win.webContents)
 
     win.loadFile(path.join(__dirname, 'app', 'app.ejs'))
-    // win.webContents.openDevTools()
+
+    win.webContents.on('before-input-event', (event, input) => {
+        if (input.control && input.key.toLowerCase() === 'i') {
+            event.preventDefault()
+        }
+    })
 
     // Initialize EJS data before loading the window
     try {
@@ -288,14 +293,6 @@ function createMenu() {
             submenu: [{
                 label: 'About Application',
                 selector: 'orderFrontStandardAboutPanel:'
-            }, {
-                type: 'separator'
-            }, {
-                label: 'Toggle Developer Tools',
-                accelerator: 'Alt+Command+I',
-                click: function() {
-                    BrowserWindow.getFocusedWindow().webContents.toggleDevTools();
-                }
             }, {
                 type: 'separator'
             }, {
